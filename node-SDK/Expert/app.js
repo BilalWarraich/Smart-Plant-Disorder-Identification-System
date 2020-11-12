@@ -70,24 +70,22 @@ console.log(req.body);
   }
 });
 
-app.post('/api/updateSession', async function (req, res) {
+app.post('/api/updateVerificationRequest', async function (req, res) {
 
   var request = {
     chaincodeId: 'agri',
-    fcn: 'updateSession',
+    fcn: 'updateVerificationRequest',
     args: [
 
-      req.body.session_ID,
-      req.body.newStatus,
-      req.body.expert_ID
-
+      req.body.verificationRequestID,
+      req.body.newStatus
     ]
   };
   console.log(req.body);
   let response = await invoke.invokeCreate(request);
   if (response) {
     if(response.status == 200)
-    res.status(response.status).send({ message: "The nutrient with ID: "+req.body.session_ID+ " is stored in the blockchain with " +response.message  });
+    res.status(response.status).send({ message: "The nutrient with ID: "+req.body.verificationRequestID+ " is stored in the blockchain with " +response.message  });
     else
     res.status(response.status).send({ message: response.message});
   }
@@ -116,6 +114,32 @@ console.log(req.body);
   }
 });
 
+app.post('/api/addExpertResponse', async function (req, res) {
+
+  var request = {
+    chaincodeId: 'agri',
+    fcn: 'addExpertResponse',
+    args: [
+      
+      req.body.responseID,
+      req.body.expert_ID,
+      req.body.farmer_ID,
+      req.body.response,
+      req.body.products
+
+    ]
+  };
+console.log(req.body);
+  let response = await invoke.invokeCreate(request);
+  if (response) {
+    if(response.status == 200)
+    res.status(response.status).send({ message: "The Expert Response with ID: "+req.body.responseID+ " is stored in the blockchain with " +response.message  });
+    else
+    res.status(response.status).send({ message: response.message});
+  }
+});
+
+
 
 //-------------------------------------------------------------
 //----------------------  GET API'S  --------------------------
@@ -141,11 +165,11 @@ app.get('/api/queryexpert', async function (req, res) {
   }
 });
 
-app.get('/api/querySession', async function (req, res) {
+app.get('/api/queryVerificationRequest', async function (req, res) {
 
   const request = {
     chaincodeId: 'agri',
-    fcn: 'querySession',
+    fcn: 'queryVerificationRequest',
     args: [
       req.query.status
     ]
@@ -177,4 +201,21 @@ app.get('/api/queryProduct', async function (req, res) {
   }
 });
 
+app.get('/api/queryExpertResponsebyFarmer', async function (req, res) {
+
+  const request = {
+    chaincodeId: 'agri',
+    fcn: 'queryExpertResponsebyFarmer',
+    args: [
+      req.query.farmer_ID
+    ]
+  };
+  let response = await query.invokeQuery(request)
+  if (response) {
+    if(response.status == 200)
+      res.status(response.status).send(JSON.parse(response.message));
+    else
+      res.status(response.status).send({ message: response.message });
+  }
+});
 

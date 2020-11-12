@@ -47,18 +47,23 @@ type Product struct {
 	Expert_ID  string `json:"expert_ID"`
 	Status     string `json:"status"`
 }
-type Session struct {
-	ObjectType      string `json:"Type"`
-	Session_ID      string `json:"session_ID"`
-	Disorder_ID     string `json:"disorder_ID"`
-	Findings_ID     string `json:"findings_ID"`
-	Uploaded_date   string `json:"uploaded_date"`
-	Image           string `json:"image"`
-	Disorder_degree string `json:"disorder_degree"`
-	Leaf_count      string `json:"leaf_count"`
-	Farmer_ID       string `json:"farmer_ID"`
-	Expert_ID       string `json:"expert_ID"`
-	Status          string `json:"status"`
+type VerificationRequest struct {
+	ObjectType            string `json:"Type"`
+	VerificationRequestID string `json:"verificationRequestID"`
+	DisorderType          string `json:"disorderType"`
+	Disorder_degree       string `json:"disorder_degree"`
+	Research_institute    string `json:"research_institute"`
+	Farmer_ID             string `json:"farmer_ID"`
+	Status                string `json:"status"`
+}
+
+type ExpertResponse struct {
+	ObjectType string   `json:"Type"`
+	ResponseID string   `json:"responseID"`
+	Expert_ID  string   `json:"expert_ID"`
+	Farmer_ID  string   `json:"farmer_ID"`
+	Response   string   `json:"response"`
+	Products   []string `json:"products"`
 }
 
 func (t *SmartContract) Init(stub shim.ChaincodeStubInterface) peer.Response {
@@ -109,23 +114,29 @@ func (t *SmartContract) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
 	if function == "queryProductbyFarmer" {
 		return t.queryProductbyFarmer(stub, args)
 	}
-	if function == "addSession" {
-		return t.addSession(stub, args)
+	if function == "addVerificationRequest" {
+		return t.addVerificationRequest(stub, args)
 	}
-	if function == "querySession" {
-		return t.querySession(stub, args)
+	if function == "queryVerificationRequest" {
+		return t.queryVerificationRequest(stub, args)
 	}
-	if function == "querySessionbyFarmer" {
-		return t.querySessionbyFarmer(stub, args)
+	if function == "queryVerificationRequestbyFarmer" {
+		return t.queryVerificationRequestbyFarmer(stub, args)
 	}
-	if function == "querySessionbyID" {
-		return t.querySessionbyID(stub, args)
+	if function == "queryVerificationRequestbyID" {
+		return t.queryVerificationRequestbyID(stub, args)
 	}
-	if function == "querySessions" {
-		return t.querySessions(stub, args)
+	if function == "queryVerificationRequests" {
+		return t.queryVerificationRequests(stub, args)
 	}
-	if function == "updateSession" {
-		return t.updateSession(stub, args)
+	if function == "addExpertResponse" {
+		return t.addExpertResponse(stub, args)
+	}
+	if function == "queryExpertResponsebyFarmer" {
+		return t.queryExpertResponsebyFarmer(stub, args)
+	}
+	if function == "updateVerificationRequest" {
+		return t.updateVerificationRequest(stub, args)
 	}
 	if function == "updateProduct" {
 		return t.updateProduct(stub, args)
@@ -136,8 +147,8 @@ func (t *SmartContract) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
 	if function == "queryAllProducts" {
 		return t.queryAllProducts(stub, args)
 	}
-	if function == "queryAllSessions" {
-		return t.queryAllSessions(stub, args)
+	if function == "queryAllVerificationRequests" {
+		return t.queryAllVerificationRequests(stub, args)
 	}
 
 	fmt.Println("Invoke did not find specified function " + function)
@@ -502,11 +513,11 @@ func (t *SmartContract) queryProducts(stub shim.ChaincodeStubInterface, args []s
 	return shim.Success(queryResults)
 }
 
-func (t *SmartContract) addSession(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+func (t *SmartContract) addVerificationRequest(stub shim.ChaincodeStubInterface, args []string) peer.Response {
 
 	var err error
 
-	if len(args) != 10 {
+	if len(args) != 6 {
 		return shim.Error("Incorrect Number of Aruments. Expecting 10")
 	}
 
@@ -531,43 +542,27 @@ func (t *SmartContract) addSession(stub shim.ChaincodeStubInterface, args []stri
 	if len(args[5]) <= 0 {
 		return shim.Error("4rd Argument Must be a Non-Empty String")
 	}
-	if len(args[6]) <= 0 {
-		return shim.Error("4rd Argument Must be a Non-Empty String")
-	}
-	if len(args[7]) <= 0 {
-		return shim.Error("4rd Argument Must be a Non-Empty String")
-	}
-	if len(args[8]) <= 0 {
-		return shim.Error("4rd Argument Must be a Non-Empty String")
-	}
-	if len(args[9]) <= 0 {
-		return shim.Error("4rd Argument Must be a Non-Empty String")
-	}
 
-	session_ID := args[0]
-	disorder_ID := args[1]
-	findings_ID := args[2]
-	uploaded_date := args[3]
-	image := args[4]
-	disorder_degree := args[5]
-	leaf_count := args[6]
-	farmer_ID := args[7]
-	expert_ID := args[8]
-	status := args[9]
+	verificationRequestID := args[0]
+	disorderType := args[1]
+	disorder_degree := args[2]
+	research_institute := args[3]
+	farmer_ID := args[4]
+	status := args[5]
 	// ======Check if defficeincy Already exists
 
-	sessionAsBytes, err := stub.GetState(session_ID)
+	verificationRequestAsBytes, err := stub.GetState(verificationRequestID)
 	if err != nil {
 		return shim.Error("Transaction Failed with Error: " + err.Error())
-	} else if sessionAsBytes != nil {
-		return shim.Error("The Inserted session ID already Exists: " + session_ID)
+	} else if verificationRequestAsBytes != nil {
+		return shim.Error("The Inserted verificationRequest ID already Exists: " + verificationRequestID)
 	}
 
 	// ===== Create defficiency Object and Marshal to JSON
 
-	objectType := "session"
-	session := &Session{objectType, session_ID, disorder_ID, findings_ID, uploaded_date, image, disorder_degree, leaf_count, farmer_ID, expert_ID, status}
-	sessionJSONasBytes, err := json.Marshal(session)
+	objectType := "verificationRequest"
+	verificationRequest := &VerificationRequest{objectType, verificationRequestID, disorderType, disorder_degree, research_institute, farmer_ID, status}
+	VerificationRequestJSONasBytes, err := json.Marshal(verificationRequest)
 
 	if err != nil {
 		return shim.Error(err.Error())
@@ -575,18 +570,18 @@ func (t *SmartContract) addSession(stub shim.ChaincodeStubInterface, args []stri
 
 	// ======= Save deficiency to State
 
-	err = stub.PutState(session_ID, sessionJSONasBytes)
+	err = stub.PutState(verificationRequestID, VerificationRequestJSONasBytes)
 	if err != nil {
 		return shim.Error(err.Error())
 	}
 
 	// ======= Return Success
 
-	fmt.Println("Successfully Saved session")
+	fmt.Println("Successfully Saved verificationRequest")
 	return shim.Success(nil)
 }
 
-func (t *SmartContract) querySession(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+func (t *SmartContract) queryVerificationRequest(stub shim.ChaincodeStubInterface, args []string) peer.Response {
 
 	if len(args) < 1 {
 		return shim.Error("Incorrect number of arguments. Expecting 1")
@@ -594,7 +589,7 @@ func (t *SmartContract) querySession(stub shim.ChaincodeStubInterface, args []st
 
 	status := args[0]
 
-	queryString := fmt.Sprintf("{\"selector\":{\"Type\":\"session\",\"status\":\"%s\"}}", status)
+	queryString := fmt.Sprintf("{\"selector\":{\"Type\":\"verificationRequest\",\"status\":\"%s\"}}", status)
 
 	queryResults, err := getQueryResultForQueryString(stub, queryString)
 	if err != nil {
@@ -604,7 +599,7 @@ func (t *SmartContract) querySession(stub shim.ChaincodeStubInterface, args []st
 	return shim.Success(queryResults)
 }
 
-func (t *SmartContract) querySessionbyFarmer(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+func (t *SmartContract) queryVerificationRequestbyFarmer(stub shim.ChaincodeStubInterface, args []string) peer.Response {
 
 	if len(args) < 1 {
 		return shim.Error("Incorrect number of arguments. Expecting 1")
@@ -612,7 +607,7 @@ func (t *SmartContract) querySessionbyFarmer(stub shim.ChaincodeStubInterface, a
 
 	farmer_ID := args[0]
 
-	queryString := fmt.Sprintf("{\"selector\":{\"Type\":\"session\",\"farmer_ID\":\"%s\"}}", farmer_ID)
+	queryString := fmt.Sprintf("{\"selector\":{\"Type\":\"verificationRequest\",\"farmer_ID\":\"%s\"}}", farmer_ID)
 
 	queryResults, err := getQueryResultForQueryString(stub, queryString)
 	if err != nil {
@@ -622,15 +617,15 @@ func (t *SmartContract) querySessionbyFarmer(stub shim.ChaincodeStubInterface, a
 	return shim.Success(queryResults)
 }
 
-func (t *SmartContract) querySessionbyID(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+func (t *SmartContract) queryVerificationRequestbyID(stub shim.ChaincodeStubInterface, args []string) peer.Response {
 
 	if len(args) < 1 {
 		return shim.Error("Incorrect number of arguments. Expecting 1")
 	}
 
-	session_ID := args[0]
+	verificationRequestID := args[0]
 
-	queryString := fmt.Sprintf("{\"selector\":{\"Type\":\"session\",\"session_ID\":\"%s\"}}", session_ID)
+	queryString := fmt.Sprintf("{\"selector\":{\"Type\":\"verificationRequest\",\"verificationRequestID\":\"%s\"}}", verificationRequestID)
 
 	queryResults, err := getQueryResultForQueryString(stub, queryString)
 	if err != nil {
@@ -640,7 +635,7 @@ func (t *SmartContract) querySessionbyID(stub shim.ChaincodeStubInterface, args 
 	return shim.Success(queryResults)
 }
 
-func (t *SmartContract) querySessions(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+func (t *SmartContract) queryVerificationRequests(stub shim.ChaincodeStubInterface, args []string) peer.Response {
 
 	if len(args) < 1 {
 		return shim.Error("Incorrect number of arguments. Expecting 1")
@@ -648,7 +643,7 @@ func (t *SmartContract) querySessions(stub shim.ChaincodeStubInterface, args []s
 
 	status := args[0]
 
-	queryString := fmt.Sprintf("{\"selector\":{\"Type\":\"session\",\"status\":{\"$ne\":\"%s\"}}}", status)
+	queryString := fmt.Sprintf("{\"selector\":{\"Type\":\"verificationRequest\",\"status\":{\"$ne\":\"%s\"}}}", status)
 
 	queryResults, err := getQueryResultForQueryString(stub, queryString)
 	if err != nil {
@@ -670,9 +665,9 @@ func (t *SmartContract) queryAllProducts(stub shim.ChaincodeStubInterface, args 
 	return shim.Success(queryResults)
 }
 
-func (t *SmartContract) queryAllSessions(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+func (t *SmartContract) queryAllVerificationRequests(stub shim.ChaincodeStubInterface, args []string) peer.Response {
 
-	queryString := fmt.Sprintf("{\"selector\":{\"Type\":\"session\"}}")
+	queryString := fmt.Sprintf("{\"selector\":{\"Type\":\"verificationRequest\"}}")
 
 	queryResults, err := getQueryResultForQueryString(stub, queryString)
 	if err != nil {
@@ -682,34 +677,114 @@ func (t *SmartContract) queryAllSessions(stub shim.ChaincodeStubInterface, args 
 	return shim.Success(queryResults)
 }
 
-func (t *SmartContract) updateSession(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+func (t *SmartContract) addExpertResponse(stub shim.ChaincodeStubInterface, args []string) peer.Response {
 
-	if len(args) < 3 {
-		return shim.Error("Incorrect number of arguments. Expecting 3")
+	var err error
+
+	if len(args) != 5 {
+		return shim.Error("Incorrect Number of Aruments. Expecting 3")
 	}
 
-	session_ID := args[0]
-	newStatus := args[1]
-	expert_ID := args[2]
-	fmt.Println("- start  ", session_ID, newStatus, expert_ID)
+	fmt.Println("Adding new response")
 
-	sessionAsBytes, err := stub.GetState(session_ID)
+	// ==== Input sanitation ====
+	if len(args[0]) <= 0 {
+		return shim.Error("1st Argument Must be a Non-Empty String")
+	}
+	if len(args[1]) <= 0 {
+		return shim.Error("2nd Argument Must be a Non-Empty String")
+	}
+	if len(args[2]) <= 0 {
+		return shim.Error("3rd Argument Must be a Non-Empty String")
+	}
+	if len(args[3]) <= 0 {
+		return shim.Error("4rd Argument Must be a Non-Empty String")
+	}
+	if len(args[4]) <= 0 {
+		return shim.Error("5rd Argument Must be a Non-Empty String")
+	}
+
+	responseID := args[0]
+	expert_ID := args[1]
+	farmer_ID := args[2]
+	response := args[2]
+	products := args[3]
+	// ======Check if admin Already exists
+
+	responseAsBytes, err := stub.GetState(responseID)
 	if err != nil {
-		return shim.Error("Failed to get status:" + err.Error())
-	} else if sessionAsBytes == nil {
-		return shim.Error("Session does not exist")
+		return shim.Error("Transaction Failed with Error: " + err.Error())
+	} else if responseAsBytes != nil {
+		return shim.Error("The Inserted response ID already Exists: " + responseID)
 	}
 
-	sessionToUpdate := Session{}
-	err = json.Unmarshal(sessionAsBytes, &sessionToUpdate) //unmarshal it aka JSON.parse()
+	// ===== Create admin Object and Marshal to JSON
+
+	objectType := "response"
+	expertResponse := &ExpertResponse{objectType, responseID, expert_ID, farmer_ID, response, append(ExpertResponse{}.Products, products)}
+	responseJSONasBytes, err := json.Marshal(expertResponse)
+
 	if err != nil {
 		return shim.Error(err.Error())
 	}
-	sessionToUpdate.Status = newStatus //change the status
-	sessionToUpdate.Expert_ID = expert_ID
 
-	sessionJSONasBytes, _ := json.Marshal(sessionToUpdate)
-	err = stub.PutState(session_ID, sessionJSONasBytes) //rewrite the marble
+	// ======= Save admin to State
+
+	err = stub.PutState(responseID, responseJSONasBytes)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	// ======= Return Success
+
+	fmt.Println("Successfully Saved admin")
+	return shim.Success(nil)
+}
+
+func (t *SmartContract) queryExpertResponsebyFarmer(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+
+	if len(args) < 1 {
+		return shim.Error("Incorrect number of arguments. Expecting 1")
+	}
+
+	farmer_ID := args[0]
+
+	queryString := fmt.Sprintf("{\"selector\":{\"Type\":\"response\",\"farmer_ID\":\"%s\"}}", farmer_ID)
+
+	queryResults, err := getQueryResultForQueryString(stub, queryString)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	return shim.Success(queryResults)
+}
+
+func (t *SmartContract) updateVerificationRequest(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+
+	if len(args) < 2 {
+		return shim.Error("Incorrect number of arguments. Expecting 3")
+	}
+
+	verificationRequestID := args[0]
+	newStatus := args[1]
+	fmt.Println("- start  ", verificationRequestID, newStatus)
+
+	verificationRequestAsBytes, err := stub.GetState(verificationRequestID)
+	if err != nil {
+		return shim.Error("Failed to get status:" + err.Error())
+	} else if verificationRequestAsBytes == nil {
+		return shim.Error("Session does not exist")
+	}
+
+	verificationRequestToUpdate := VerificationRequest{}
+	err = json.Unmarshal(verificationRequestAsBytes, &verificationRequestToUpdate) //unmarshal it aka JSON.parse()
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+	verificationRequestToUpdate.Status = newStatus //change the status
+
+	verificationRequestJSONasBytes, _ := json.Marshal(verificationRequestToUpdate)
+	err = stub.PutState(verificationRequestID, verificationRequestJSONasBytes) //rewrite the marble
 	if err != nil {
 		return shim.Error(err.Error())
 	}

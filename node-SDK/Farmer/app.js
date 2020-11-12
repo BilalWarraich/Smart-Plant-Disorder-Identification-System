@@ -71,22 +71,18 @@ console.log(req.body);
   }
 });
 
-app.post('/api/addSession', async function (req, res) {
+app.post('/api/addVerificationRequest', async function (req, res) {
 
   var request = {
     chaincodeId: 'agri',
-    fcn: 'addSession',
+    fcn: 'addVerificationRequest',
     args: [
 
-      req.body.session_ID,
-      req.body.disorder_ID,
-      req.body.findings_ID,
-      req.body.uploaded_date,
-      req.body.image,
+      req.body.verificationRequestID,
+      req.body.disorderType,
       req.body.disorder_degree,
-      req.body.leaf_count,
+      req.body.research_institute,
       req.body.farmer_ID,
-      req.body.expert_ID,
       req.body.status
 
     ]
@@ -95,7 +91,7 @@ console.log(req.body);
   let response = await invoke.invokeCreate(request);
   if (response) {
     if(response.status == 200)
-    res.status(response.status).send({ message: "The session with ID: "+req.body.session_ID+ " is stored in the blockchain with " +response.message  });
+    res.status(response.status).send({ message: "The verificationRequest with ID: "+req.body.verificationRequestID+ " is stored in the blockchain with " +response.message  });
     else
     res.status(response.status).send({ message: response.message});
   }
@@ -153,11 +149,11 @@ app.get('/api/queryFarmer', async function (req, res) {
   }
 });
 
-app.get('/api/querySession', async function (req, res) {
+app.get('/api/queryVerificationRequest', async function (req, res) {
 
   const request = {
     chaincodeId: 'agri',
-    fcn: 'querySession',
+    fcn: 'queryVerificationRequest',
     args: [
       req.query.status
     ]
@@ -171,11 +167,11 @@ app.get('/api/querySession', async function (req, res) {
   }
 });
 
-app.get('/api/querySessions', async function (req, res) {
+app.get('/api/queryVerificationRequests', async function (req, res) {
 
   const request = {
     chaincodeId: 'agri',
-    fcn: 'querySessions',
+    fcn: 'queryVerificationRequests',
     args: [
       req.query.status
     ]
@@ -189,11 +185,11 @@ app.get('/api/querySessions', async function (req, res) {
   }
 });
 
-app.get('/api/querySessionbyFarmer', async function (req, res) {
+app.get('/api/queryVerificationRequestbyFarmer', async function (req, res) {
 
   const request = {
     chaincodeId: 'agri',
-    fcn: 'querySessionbyFarmer',
+    fcn: 'queryVerificationRequestbyFarmer',
     args: [
       req.query.farmer_ID
     ]
@@ -261,5 +257,21 @@ app.get('/api/queryProducts', async function (req, res) {
   }
 });
 
+app.get('/api/queryExpertResponsebyFarmer', async function (req, res) {
 
+  const request = {
+    chaincodeId: 'agri',
+    fcn: 'queryExpertResponsebyFarmer',
+    args: [
+      req.query.farmer_ID
+    ]
+  };
+  let response = await query.invokeQuery(request)
+  if (response) {
+    if(response.status == 200)
+      res.status(response.status).send(JSON.parse(response.message));
+    else
+      res.status(response.status).send({ message: response.message });
+  }
+});
 

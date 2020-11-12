@@ -43,6 +43,7 @@
                             <td>Farmer_ID</td>
                             <td>Expert_ID</td>
                             <td>Response</td>
+                            <td>Products</td>
                         </tr>
                     </thead>
                     <tbody>
@@ -86,7 +87,7 @@ $(document).ready(function () {
     
     $.ajax({
             type: "GET",
-			url: 'http://localhost:8000/api/querySessionbyFarmer?farmer_ID='+farmer_ID+'',
+			url: 'http://localhost:8000/api/queryExpertResponsebyFarmer?farmer_ID='+farmer_ID+'',
            cache: false,
          complete: function (data, status) {
            if (status === 'error' || !data.responseText ||data.responseJSON == '' ) {
@@ -95,14 +96,14 @@ $(document).ready(function () {
            else {
             for(var i =0 ; i< data.responseJSON.length ; i++){
                 var items = [
-                    { Request_ID: data.responseJSON[i].Record.session_ID, Farmer_ID : data.responseJSON[i].Record.farmer_ID ,Expert_ID : data.responseJSON[i].Record.expert_ID,Response: data.responseJSON[i].Record.status },
+                    { Request_ID: data.responseJSON[i].Record.responseID, Farmer_ID : data.responseJSON[i].Record.farmer_ID ,Expert_ID : data.responseJSON[i].Record.expert_ID,Response: data.responseJSON[i].Record.response,Products: data.responseJSON[i].Record.products  },
                    
                 ];
                  console.log(items);
                 var rows = "";
                 $.each(items, function(){
                     var expert_ID = addressFromLink;
-                rows += "<tr><td>" + this.Request_ID + "</td><td>" + this.Farmer_ID + "</td><td>" + this.Expert_ID + "</td><td>" + this.Response + "</td></tr>";
+                rows += "<tr><td>" + this.Request_ID + "</td><td>" + this.Farmer_ID + "</td><td>" + this.Expert_ID + "</td><td>" + this.Response + "</td><td>" + this.Products + "</td></tr>";
                 });
                 console.log(rows);
                  $( rows ).appendTo( "#itemList tbody" );

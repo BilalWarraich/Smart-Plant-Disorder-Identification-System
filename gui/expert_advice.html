@@ -38,34 +38,18 @@
 				</div>
 
 				<div class="wrap-input100 validate-input bg1" >
-					<span class="label-input100">Disorder ID *</span>
-					<input class="input100" type="number" name="disorder_ID" placeholder="Disorder ID">
-				</div>
-
-				<div class="wrap-input100 validate-input bg1" >
-					<span class="label-input100">Findings ID *</span>
-					<input class="input100" type="number" name="findings_ID" placeholder="Findings ID">
-				</div>
-
-				<div class="wrap-input100 validate-input bg1" >
-					<span class="label-input100">Uploaded Date *</span>
-					<input class="input100" type="date" name="uploaded_date" placeholder="Uploaded Date">
-				</div>
-
-				<div>
-					<input id="inp" type='file'>
-					<p hidden id="b64"></p>
-					<img id="img" height="150">
+					<span class="label-input100">Disorder Type *</span>
+					<input class="input100" type="text" name="disorder_ID" placeholder="Disorder Type">
 				</div>
 
 				<div class="wrap-input100 validate-input bg1" data-validate="Please Give Details">
 					<span class="label-input100">Disorder Degree</span>
-					<input class="input100" type="number" name="disorder_degree" placeholder="Disorder Degree">
+					<input class="input100" type="text" name="disorder_degree" placeholder="Disorder Degree">
 				</div>
 
 				<div class="wrap-input100 validate-input bg1" data-validate="Please Give Details">
-					<span class="label-input100">Leaf Count</span>
-					<input class="input100" type="number" name="leaf_count" placeholder="Leaf Count">
+					<span class="label-input100">Research Institute </span>
+					<input class="input100" type="text" name="leaf_count" placeholder="Research Institute">
 				</div>
 
 				<div class="container-contact100-form-btn">
@@ -113,8 +97,6 @@ $(document).ready(function () {
 	
 });
 $(document).on('click', '#submit', function (evt) {
-	var a = document.getElementById("b64").innerHTML;
-	console.log(a);
 
 	
 		evt.preventDefault();
@@ -125,26 +107,18 @@ $(document).on('click', '#submit', function (evt) {
 
 		$.ajax({
             type: "POST",
-			url: "http://localhost:8000/api/addSession",
+			url: "http://localhost:8000/api/addVerificationRequest",
             data: {
 			 
-			"session_ID" : ID,
+			"verificationRequestID" : ID,
 
-			"disorder_ID" : $("input[type=number][name=disorder_ID]").val(),
+			"disorderType" : $("input[type=text][name=disorder_ID]").val(),
 
-			"findings_ID" : $("input[type=number][name=findings_ID]").val(),
-
-			"uploaded_date" : $("input[type=date][name=uploaded_date]").val(),
-
-			"image" : a,
-
-			"disorder_degree" : $("input[type=number][name=disorder_degree]").val(),
+			"disorder_degree" : $("input[type=text][name=disorder_degree]").val(),
 			
-			"leaf_count" : $("input[type=number][name=leaf_count]").val(),
+			"research_institute" : $("input[type=text][name=leaf_count]").val(),
              
             "farmer_ID" : farmer_ID,
-
-            "expert_ID" : nan,
 
             "status" : 'requested',
 
@@ -178,23 +152,7 @@ function getQueryVariable(variable)
           }
           return(false);
       }
-	  function readFile() {
-  
-  if (this.files && this.files[0]) {
-    
-    var FR= new FileReader();
-    
-    FR.addEventListener("load", function(e) {
-      document.getElementById("img").src       = e.target.result;
-      document.getElementById("b64").innerHTML = e.target.result;
-    }); 
-    
-    FR.readAsDataURL( this.files[0] );
-  }
-  
-}
 
-      document.getElementById("inp").addEventListener("change", readFile);
  </script>
  <script>if (window.module) module = window.module;</script>
 </body>

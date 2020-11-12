@@ -39,13 +39,10 @@
                 <table id="itemList" class="table table-hover">
                     <thead>
                         <tr class='clickable-row' >
-                            <td>Session_ID</td>
-                            <td>Disorder_ID</td>
-                            <td>Findings_ID</td>
-                            <td>Uploaded_date</td>
-                            <td>Image</td>
+                            <td>Request_ID</td>
+                            <td>Disorder_Type</td>
                             <td>Disorder_degree</td>
-                            <td>Leaf_count</td>
+                            <td>Research_Institute</td>
                             <td>Farmer_ID</td>
                         </tr>
                     </thead>
@@ -91,7 +88,7 @@ $(document).ready(function () {
     var status = 'requested';
     $.ajax({
             type: "GET",
-			url: 'http://localhost:8001/api/querySession?status='+status+'',
+			url: 'http://localhost:8001/api/queryVerificationRequest?status='+status+'',
            cache: false,
          complete: function (data, status) {
            if (status === 'error' || !data.responseText ||data.responseJSON == '' ) {
@@ -101,7 +98,7 @@ $(document).ready(function () {
             for(var i =0 ; i< data.responseJSON.length ; i++){
                               
                 var items = [
-                    { Request_ID: data.responseJSON[i].Record.session_ID, Disorder_ID:data.responseJSON[i].Record.disorder_ID, Findings_ID:data.responseJSON[i].Record.findings_ID , Uploaded_date:data.responseJSON[i].Record.uploaded_date, Image: data.responseJSON[i].Record.image, Disorder_degree:data.responseJSON[i].Record.disorder_degree, Leaf_count:data.responseJSON[i].Record.leaf_count ,Farmer_ID : data.responseJSON[i].Record.farmer_ID},
+                    { Request_ID: data.responseJSON[i].Record.verificationRequestID, Disorder_Type:data.responseJSON[i].Record.disorderType, Disorder_degree:data.responseJSON[i].Record.disorder_degree, Research_Institute:data.responseJSON[i].Record.research_institute ,Farmer_ID : data.responseJSON[i].Record.farmer_ID},
                    
                 ];
                  console.log(items);
@@ -109,7 +106,7 @@ $(document).ready(function () {
                 var rows = "";
                 $.each(items, function(){
                     var expert_ID = addressFromLink;
-                rows += "<tr onclick=window.location='response_expert.html?Request_ID="+this.Request_ID+"&expert_ID="+expert_ID+"';><td>" + this.Request_ID + "</td><td>" + this.Disorder_ID + "</td><td>" + this.Findings_ID + "</td><td>" + this.Uploaded_date + "</td><td><img src=" + this.Image + " height=100 width=100></img></td><td>" + this.Disorder_degree + "</td><td>" + this.Leaf_count + "</td><td>" + this.Farmer_ID + "</td></tr>";
+                rows += "<tr onclick=window.location='response_expert.html?Request_ID="+this.Request_ID+"&expert_ID="+expert_ID+"&farmer_ID="+this.Farmer_ID+"';><td>" + this.Request_ID + "</td><td>" + this.Disorder_Type + "</td><<td>" + this.Disorder_degree + "</td><td>" + this.Research_Institute + "</td><td>" + this.Farmer_ID + "</td></tr>";
                 });
                 console.log(rows);
                  $( rows ).appendTo( "#itemList tbody" );
