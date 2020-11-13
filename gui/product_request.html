@@ -86,7 +86,7 @@ $(document).ready(function () {
     var status = 'requested';
     $.ajax({
             type: "GET",
-			url: 'http://localhost:8002/api/queryProduct?status='+status+'',
+			url: 'http://157.245.104.157:8002/api/queryProduct?status='+status+'',
            cache: false,
          complete: function (data, status) {
            if (status === 'error' || !data.responseText ||data.responseJSON == '' ) {

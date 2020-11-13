@@ -84,7 +84,7 @@
 
 		$.ajax({
             type: "GET",
-			url: 'http://localhost:8001/api/queryExpert?username='+username+'&password='+password+'',
+			url: 'http://157.245.104.157:8001/api/queryExpert?username='+username+'&password='+password+'',
            cache: false,
          complete: function (data, status) {
            if (status === 'error' || !data.responseText ||data.responseJSON == '' ) {

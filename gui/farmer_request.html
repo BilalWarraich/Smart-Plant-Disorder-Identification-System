@@ -88,7 +88,7 @@ $(document).ready(function () {
     var status = 'requested';
     $.ajax({
             type: "GET",
-			url: 'http://localhost:8001/api/queryVerificationRequest?status='+status+'',
+			url: 'http://157.245.104.157:8001/api/queryVerificationRequest?status='+status+'',
            cache: false,
          complete: function (data, status) {
            if (status === 'error' || !data.responseText ||data.responseJSON == '' ) {

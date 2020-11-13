@@ -84,7 +84,7 @@ $(document).on('click', '#submit', function (evt) {
 
 		$.ajax({
             type: "GET",
-			url: 'http://localhost:8000/api/queryFarmer?username='+username+'&password='+password+'',
+			url: 'http://157.245.104.157:8000/api/queryFarmer?username='+username+'&password='+password+'',
            cache: false,
          complete: function (data, status) {
            if (status === 'error' || !data.responseText || data.responseJSON == '') {
