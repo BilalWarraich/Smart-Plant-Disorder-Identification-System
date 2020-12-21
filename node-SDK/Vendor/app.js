@@ -64,7 +64,7 @@ console.log(req.body);
   let response = await invoke.invokeCreate(request);
   if (response) {
     if(response.status == 200)
-    res.status(response.status).send({ message: "The Expert with ID: "+req.body.vendor_ID+ " is stored in the blockchain with " +response.message  });
+    res.status(response.status).send({ message: "The Vendor with ID: "+req.body.vendor_ID+ " is stored in the blockchain with " +response.message  });
     else
     res.status(response.status).send({ message: response.message});
   }
